@@ -145,6 +145,7 @@ DIST          = /opt/qtrpi/raspi/qt5/mkspecs/features/spec_pre.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/qt_config.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/devices/linux-rpi3-g++/qmake.conf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/spec_post.prf \
+		../src/.qmake.stash \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/exclusive_builds.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/default_pre.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/resolve_config.prf \
@@ -267,6 +268,7 @@ Makefile: ../src/src.pro /opt/qtrpi/raspi/qt5/mkspecs/devices/linux-rpi3-g++/qma
 		/opt/qtrpi/raspi/qt5/mkspecs/features/qt_config.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/devices/linux-rpi3-g++/qmake.conf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/exclusive_builds.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/default_pre.prf \
 		/opt/qtrpi/raspi/qt5/mkspecs/features/resolve_config.prf \
@@ -374,6 +376,7 @@ Makefile: ../src/src.pro /opt/qtrpi/raspi/qt5/mkspecs/devices/linux-rpi3-g++/qma
 /opt/qtrpi/raspi/qt5/mkspecs/features/qt_config.prf:
 /opt/qtrpi/raspi/qt5/mkspecs/devices/linux-rpi3-g++/qmake.conf:
 /opt/qtrpi/raspi/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /opt/qtrpi/raspi/qt5/mkspecs/features/exclusive_builds.prf:
 /opt/qtrpi/raspi/qt5/mkspecs/features/default_pre.prf:
 /opt/qtrpi/raspi/qt5/mkspecs/features/resolve_config.prf:
@@ -834,6 +837,62 @@ userwindow.o: ../src/userwindow.cpp ../src/userwindow.h \
 		../src/beverageclass.h \
 		../src/systemclass.h \
 		ui_userwindow.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/QVariant \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QAction \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qaction.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qactiongroup.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QApplication \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qapplication.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/qcoreapplication.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/qeventloop.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qdesktopwidget.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qguiapplication.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qinputmethod.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QButtonGroup \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qbuttongroup.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QFrame \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qframe.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QGridLayout \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qgridlayout.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qlayout.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qlayoutitem.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qboxlayout.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QHeaderView \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qheaderview.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractitemview.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractscrollarea.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/qabstractitemmodel.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/qitemselectionmodel.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractitemdelegate.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qstyleoption.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractspinbox.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qvalidator.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtCore/qregularexpression.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qslider.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractslider.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qstyle.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qtabbar.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qrubberband.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QLCDNumber \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qlcdnumber.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QLabel \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qlabel.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QLineEdit \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qlineedit.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qtextcursor.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qtextformat.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qpen.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qtextoption.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QPushButton \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qpushbutton.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qabstractbutton.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QStackedWidget \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qstackedwidget.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QTextBrowser \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qtextbrowser.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/qtextedit.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtGui/qtextdocument.h \
+		/opt/qtrpi/raspi/qt5pi/include/QtWidgets/QWidget \
 		/opt/qtrpi/raspi/qt5pi/include/QtCore/QSignalMapper \
 		/opt/qtrpi/raspi/qt5pi/include/QtCore/qsignalmapper.h \
 		/opt/qtrpi/raspi/qt5pi/include/QtCore/QProcess \
@@ -854,12 +913,12 @@ moc_userwindow.o: moc_userwindow.cpp
 ####### Install
 
 install_target: first FORCE
-	@test -d $(INSTALL_ROOT)/opt/src/bin || mkdir -p $(INSTALL_ROOT)/opt/src/bin
-	-$(INSTALL_PROGRAM) $(QMAKE_TARGET) $(INSTALL_ROOT)/opt/src/bin/$(QMAKE_TARGET)
+	@test -d $(INSTALL_ROOT)/opt/beverage-POS/currentrelease || mkdir -p $(INSTALL_ROOT)/opt/beverage-POS/currentrelease
+	-$(INSTALL_PROGRAM) $(QMAKE_TARGET) $(INSTALL_ROOT)/opt/beverage-POS/currentrelease/$(QMAKE_TARGET)
 
 uninstall_target: FORCE
-	-$(DEL_FILE) $(INSTALL_ROOT)/opt/src/bin/$(QMAKE_TARGET)
-	-$(DEL_DIR) $(INSTALL_ROOT)/opt/src/bin/ 
+	-$(DEL_FILE) $(INSTALL_ROOT)/opt/beverage-POS/currentrelease/$(QMAKE_TARGET)
+	-$(DEL_DIR) $(INSTALL_ROOT)/opt/beverage-POS/currentrelease/ 
 
 
 install: install_target  FORCE
