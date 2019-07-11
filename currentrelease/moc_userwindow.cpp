@@ -1,25 +1,23 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'userwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.3)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.7.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../pm-tnmjc/src/userwindow.h"
+#include "../src/userwindow.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'userwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.12.3. It"
+#error "This file was generated using the moc from 5.7.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-QT_WARNING_PUSH
-QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_userwindow_t {
     QByteArrayData data[23];
     char stringdata0[540];
@@ -77,7 +75,7 @@ QT_MOC_LITERAL(22, 511, 28) // "on_lineEdit_cl_returnPressed"
 static const uint qt_meta_data_userwindow[] = {
 
  // content:
-       8,       // revision
+       7,       // revision
        0,       // classname
        0,    0, // classinfo
       20,   14, // methods
@@ -137,13 +135,13 @@ static const uint qt_meta_data_userwindow[] = {
 void userwindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<userwindow *>(_o);
+        userwindow *_t = static_cast<userwindow *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: { bool _r = _t->userButtonPressed((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         case 1: { bool _r = _t->beverageButtonPressed((*reinterpret_cast< int(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         case 2: _t->on_pushButton_pageBack_clicked(); break;
         case 3: _t->on_pushButton_history_clicked(); break;
         case 4: _t->on_pushButton_addMoney_clicked(); break;
@@ -167,14 +165,10 @@ void userwindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject userwindow::staticMetaObject = { {
-    &QMainWindow::staticMetaObject,
-    qt_meta_stringdata_userwindow.data,
-    qt_meta_data_userwindow,
-    qt_static_metacall,
-    nullptr,
-    nullptr
-} };
+const QMetaObject userwindow::staticMetaObject = {
+    { &QMainWindow::staticMetaObject, qt_meta_stringdata_userwindow.data,
+      qt_meta_data_userwindow,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+};
 
 
 const QMetaObject *userwindow::metaObject() const
@@ -184,9 +178,9 @@ const QMetaObject *userwindow::metaObject() const
 
 void *userwindow::qt_metacast(const char *_clname)
 {
-    if (!_clname) return nullptr;
+    if (!_clname) return Q_NULLPTR;
     if (!strcmp(_clname, qt_meta_stringdata_userwindow.stringdata0))
-        return static_cast<void*>(this);
+        return static_cast<void*>(const_cast< userwindow*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
@@ -206,5 +200,4 @@ int userwindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     }
     return _id;
 }
-QT_WARNING_POP
 QT_END_MOC_NAMESPACE
