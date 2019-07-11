@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="png-arrow">../res/icons/arrow.png</file>
+        <file alias="png-history">../res/icons/history.png</file>
+        <file alias="png-money">../res/icons/money.png</file>
+        <file alias="png-settings">../res/icons/settings.png</file>
+        <file alias="png-flenspils">../res/icons/flenspils.png</file>
+        <file alias="png-aktienZwickl">../res/icons/aktienZwickl.png</file>
+        <file alias="png-bionade">../res/icons/bionade.png</file>
+        <file alias="png-clubmate">../res/icons/clubmate.png</file>
+        <file alias="png-einbeckerpils">../res/icons/einbeckerpils.png</file>
+        <file alias="png-fritzcola">../res/icons/fritzcola.png</file>
+        <file alias="png-fritzorange">../res/icons/fritzorange.png</file>
+        <file alias="png-fritzzitrone">../res/icons/fritzzitrone.png</file>
+        <file alias="png-miocola">../res/icons/miocola.png</file>
+        <file alias="png-vitamalz">../res/icons/vitamalz.png</file>
+        <file alias="png-wolterspilsener">../res/icons/wolterspilsener.png</file>
+        <file alias="png-woltersweizenalkfrei">../res/icons/woltersweizenalkfrei.png</file>
+    </qresource>
+</RCC>
