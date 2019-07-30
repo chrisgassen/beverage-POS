@@ -37,13 +37,17 @@ int User::getRole() {
 
 /**\brief Setzt den Kontostand neu und stellt sicher, dass es eine Positivkasse bleibt
  * \param money Betrag, der hinzugefuegt oder abgezogen wird
- * \return textausgabe, die den (Nicht) Erfolg quittiert und den aktuellen Kontostand anzeigt
+ * \return bool (quittiert den (Nicht) Erfolg)
  * \author Chris
  * \warning Damit Einzahlungen und Auszahlungen moeglich sind und trotzdem die Kasse immer positiv bleibt, muss Geld, das hinzugefügt werden soll, als negativer Wert der Funktion Ÿbergene werden
  */
-void User::setBalance(double money) {
+bool User::setBalance(double money) {
     if (money <= balance) {
         balance -= money;
+        return true;
+    }
+    else {
+        return false;
     }
 }
 

@@ -1,5 +1,7 @@
 # res - Ressource Files
 
-Verschiedene Ressourcen befinden sich hier. Unter anderem:
+Different Ressources
 
   - Icons
+  - test databases
+  - sample Qt project file

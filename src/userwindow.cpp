@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QDateTime>
 #include <QTimer>
+#include <QFont>
 
 /**\brief Konstruktor der UI
  * Erstellt die UI mit bestimmten Einstllungen.
@@ -20,8 +21,14 @@ userwindow::userwindow(QWidget *parent) :
     adminLoggedIn = false;
     activeUserID = -1; //stellt sicher, dass kein tatsächlich existierender Nutzer aktiv gesetzt ist
     ui->setupUi(this);
-    QFont courierFont("Courier", 11, QFont::Medium, false);
+    QFont latoFont("Lato", 12, QFont::Medium, false); // font for most ui text fields
+    QFont courierFont("Courier", 10, QFont::Medium, false); // font for settings- and (transaction)history-window
+    ui->label_topNotificationBar->setFont(latoFont);
+    ui->label_balance->setFont(latoFont);
+    ui->label_infobox->setFont(latoFont);
+    ui->label_error->setFont(latoFont);
     ui->textBrowser_clOutput->setFont(courierFont);
+    ui->textBrowser_history->setFont(courierFont);
     ui->stackedWidget->setCurrentIndex(0);
     ui->label_topNotificationBar->setText("ags Getränkekasse");
     ui->label_balance->setText("");
@@ -36,10 +43,33 @@ userwindow::userwindow(QWidget *parent) :
 
     // Datenbanken lesen und daraus Buttons erstellen
     users = readUsersFromDB();
-    beverages = readBeveragesFromDB();
-    system = readSystemFromDB();
-    updateUserGrid(users);
-    updateBeverageGrid(beverages);
+    if (users.empty()) { // when no user exists, the first-time-setup routine gets put into effect
+        system.setvBalance(0); // setting up a new system
+        system.setPassword("pm-tnmjc");
+        writeSystemToDB(system);
+        adminLoggedIn = true;
+        activeUserID = 0;
+        ui->lineEdit_cl->setEchoMode(QLineEdit::Normal);
+        ui->stackedWidget->setCurrentIndex(4);
+        ui->pushButton_pageBack->setEnabled(true);
+        ui->label_topNotificationBar->setText("First-Time-Setup");
+        ui->textBrowser_clOutput->append("Sie starten diese Software vermutlich zum ersten Mal...");
+        ui->textBrowser_clOutput->append("Zuerst müssen Sie ihr eigenes Nutzerkonto anlegen:");
+        ui->textBrowser_clOutput->append("addusr <Nutzername> 2");
+        ui->textBrowser_clOutput->append("Zudem sollten Sie unbedingt jetzt sofort das Passwort für dieses Einstellungsfenster ändern:");
+        ui->textBrowser_clOutput->append("setpw <Passwort>");
+        ui->textBrowser_clOutput->append("Alternativ können Sie aus disesem Repo unter 'res/testDatabases' die Testdatenbanken neben die ausführbare Datei kopieren. Das Passwort lautet dann '1234'...");
+        ui->textBrowser_clOutput->append("Für alle weiteren Kommandos zum verwalten dieser Software geben Sie bitte 'help' ein.");
+        ui->textBrowser_clOutput->append("Für eine ausführliche Dokumentation dieser Software besuchen Sie bitte unser Wiki:");
+        ui->textBrowser_clOutput->append("https://github.com/TUBSAPISS2019/pm-tnmjc/wiki");
+        ui->textBrowser_clOutput->append("Fröhliches Getränkekaufen!");
+    }
+    else { // otherwise the program continues to load the other databases and finishes setting up the ui
+        beverages = readBeveragesFromDB();
+        system = readSystemFromDB();
+        updateUserGrid(users);
+        updateBeverageGrid(beverages);
+    }
 }
 
 userwindow::~userwindow()
@@ -94,7 +124,8 @@ bool userwindow::updateUserGrid(vector<User> fUsers) {
  * Zum Layout gehören z.b. folgende Eigenschaften: Textfeldgroesse, Schriftart- und -groesse, Icon, etc.
  * Bei niedrigem Getraenkestand (stock <= 5) wird Warnung ausgegeben; bei stock == 0 wird Button "deaktiviert".
  * Zusätzlich wird jeder Button mit einem Signal-Mapper verbunden.
- * \return Textfeld mit Warnung ueber niedrigen Getraenkestand
+ * \param vector<Beverage> (alle Getränkeobjekte im Vector)
+ * \return true (standardmäßig; in Version 2 könnten mit der false-Rückgabe auch Fehler ausgegeben werden)
  * \author Nicolas
  */
 bool userwindow::updateBeverageGrid(vector<Beverage> fBeverages) {
@@ -120,6 +151,7 @@ bool userwindow::updateBeverageGrid(vector<Beverage> fBeverages) {
     connect(bvrmapper,SIGNAL(mapped(int)),this,SLOT(beverageButtonPressed(int)));
     return true;
 }
+
 /**\brief rekursiv aufgerufenes Layout Setup, kann von Nutzerauswahl und von Getränkeauswahl aufgerufen werden
  * \return Widgets (Pushbutton)
  * \author Jan-Uwe
@@ -130,13 +162,15 @@ bool userwindow::clearGrid(QLayout *layout)
         return true;
     }
     while (auto item = layout->takeAt(0)) {
-          delete item->widget();
-          clearGrid(item->layout());
+        delete item->widget();
+        clearGrid(item->layout());
     }
 }
+
 /**\brief Schaltet den Zustand der Navigationsbuttons um
  * \Der Settingsbutton wird nur für den Betreiber/Admin aktiv gesetzt
- * \param bool status (true oder false)
+ * \param bool status (true oder false, also Button aktiv oder inaktiv setzen)
+ * \return true (per Default [in zukünftigen Versionen könnte noch auf Fehler hingewiesen werden, dann false bei Fehler])
  * \author Maximilian
  */
 bool userwindow::updateMenuButtons(bool status)
@@ -154,7 +188,6 @@ bool userwindow::updateMenuButtons(bool status)
 }
 
 
-
 //
 // Backend Methoden
 //
@@ -162,16 +195,19 @@ bool userwindow::updateMenuButtons(bool status)
 /**\brief Schreibt alle Nutzer mit ihren Attributen in eine Datei
  * (Serialisierung der Nutzer-Objekte)
  * Die Datei wird geöffnet und in jede Zeile wird jeweils ein Nutzer geschrieben.
+ * Der bereits vorhandene Inhalt wird jeweils überschrieben!
  * Die verschiedenen Attribute eines jeden Nutzers werden durch Semikolons getrennt.
  * Wenn alle Objekte "abgeschrieben" wurden, wird die Datei geschlossen.
  * \param vector<User> fUser (der Methode wird der Vektor, der aus allen Nutzerobjekten besteht, übergeben)
+ * \return  true (wenn Methode ohne größere Fehler abgeschlossen)
+ *          false (wenn Datenbank nicht geöffnet werden konnte)
  * \author Chris
  */
 bool userwindow::writeUsersToDB(vector<User> fUser) {
     ofstream tmpUserDB;
     tmpUserDB.open("userDB.txt");
     if (tmpUserDB.is_open()) {
-        for (int i=0; i < fUser.size(); i++) {
+        for (int i=0; i < fUser.size(); i++) { // für jeden Nutzer eine neue Zeile
             tmpUserDB << fUser[i].getName() << ";" << fUser[i].getBalance() << ";" << fUser[i].getRole() << endl;
         }
     }
@@ -329,14 +365,32 @@ System userwindow::readSystemFromDB() {
     return fSystem;
 }
 
+/**\brief Wandelt die User-ID in einen immer gleich langen String um
+ * \param id (ID des aktiven Users als int)
+ * \return sID (ID als "normalisierter" string)
+ * \warning Diese Methode geht davon aus, dass es nicht mehr als 100 Nutzer gibt!!
+ * \author Nicolas
+ */
+string userwindow::convertUserID(int id)
+{
+    string sID;
+    if (id < 10) { //Um die immer gleiche Länge von TransaktionsIDs zu gewährleisten wird die UserID notfalls um eine Null verlängert
+        sID = "0" + to_string(id);
+    }
+    else {
+        sID = to_string(id);
+    }
+    return sID;
+}
+
 
 //
 // Slots
 //
 
-/**\brief Wenn der User-Button gedrueckt wurde, wird der aktive Nutzer gesetzt.
- * Zusätzlich werden Name und Kontostand ausgelesen und die GUI wird damit aktualisiert.
- * \param id ID des aktiven Users
+/**\brief avtiveUserID wird die ID des ausgewählten Benutzers übergeben. Um nach der Ausgabe den Name des eingeloggten Nutzers anzuzeigen, wird mit der Methode "getName()" der Name der ausgewählten Person abgefragt. Um dem Nutzer nun sein aktuelles Guthaben anzuzeigen, wird dieses mit der Methode "getBalance()" aus der Datenbank anhand der UserID angefragt. Der Name und das Guthaben werden in der Kopfleiste der GUI ausgegeben. Um weitere Aktionen durchzuführen wird zusätzlich eine neue GUI-Seite angezeigt, auf der nun Getränke gewählt, die Buchungshistorie eingesehen, Geldaufgeladen, sich als Admin in die Einstellungen einzuloggen oder sich wieder auszuloggen.
+ * \param id (ID des aktiven Users)
+ * \return wenn die Funktion komplett durchlaufen wurde, gibt sie den Wert "true" zurück
  * \author Nicolas
  */
 bool userwindow::userButtonPressed(int id)
@@ -351,42 +405,52 @@ bool userwindow::userButtonPressed(int id)
     return true;
 }
 
-/**\brief Kauft ein Getränk für den jeweiligen Nutzer
- *  Wird beim Klick auf einen Getränkeknopf aufgerufen und soll das jeweilige Getränk kaufen.
- *  Versucht das Geld vom Konto des Nutzers abzubuchen. Wenn das erolgreich war, wird das Getränk tatsächlich "überschrieben", d.h. tatsächlich der Bestand verringert.
- *  Anschließend werden noch die Änderungen in die Datenbanken geschrieben und das UI aktualisiert.
- * \return Textrückgabe (wenn nicht genug Guthaben)
+/**\brief In dieser Funktion wird der eigentliche Kaufvorgang abgewickelt
+ * \Dazu versucht die Funktion den Preis des Getränks vom Konto des Nutzers abzubuchen. (1)
+ * \Wenn dies erfolgreich war und das Getränk noch verfügbar ist (2), wird der Bestand des ausgewählten Getränks um 1 verringert (3).
+ * \Das durch den Kauf geänderte Guthaben wird in die Nutzerdatenbank geschrieben (4), der geänderte Bestand wird in die Getränkedatenbak geschrieben (5).
+ * \Zusätzlich wird die Datei "transactionlog.txt" geöffnet (6). Wenn die Datei erfolgreich geöffnet werden konnte, wird die getätigte Buchung mit Angaben zu:
+ * \        * Datum und der Uhrzeit (7),
+ * \        * der NutzerID, des Getränkepreises, des Getränkenamens und des neuen Guthabens des Nutzerkontos in diese Datei geschrieben (8).
+ * \Falls die Datei nicht geöffnet werden kann, wird eine false returned (9).
+ * \Nachdem die Datenbank geschlossen wurde (10), wird das UI an den geänderten Getränkebestand angepasst (11).
+ * \Es wird wieder die Startseite aufgerufen (14) und die Topbar entsprechend ausgefüllt (12).
+ * \Die möglichen Menubuttons in der Fußzeile werden angepasst (13).
+ * \Am Ende wird der Nutzer ausgeloggt und durch das setzten der UserID auf -1 wird sichergestellt, dass kein Nutzer aktiv gesetzt ist (15).
+ * \Wenn der Nutzter nicht genügend Geld auf seinem Konto hat, wird ihm angezeigt, dass er nichtmehr genügend Geld auf seinem Konto hat (16) und es wird false zurückgegeben.
+ * \param Getränke id
+ * \return false (Buchung konnte nicht durchgeführt werden (17), oder Log konnte nicht geöffnet werden (9))
+           true (Buchung konnte erfolgreich durchgeführt werden)
  * \author Jan-Uwe
  */
 bool userwindow::beverageButtonPressed(int id)
 {
-    double UserBalanceBeforePurchase = users[activeUserID].getBalance();
-    users[activeUserID].setBalance(beverages[id].getPrice());
-    if (UserBalanceBeforePurchase > users[activeUserID].getBalance() && beverages[id].getStock() > 0) {
-        beverages[id].setStock(beverages[id].getStock()-1);
-        writeUsersToDB(users);
-        writeBeveragesToDB(beverages);
+    bool transactionSuccess = users[activeUserID].setBalance(beverages[id].getPrice()); //(1)
+    if (transactionSuccess && beverages[id].getStock() > 0) { //(2)
+        beverages[id].setStock(beverages[id].getStock()-1); //(3)
+        writeUsersToDB(users); //(4)
+        writeBeveragesToDB(beverages); //(5)
         ofstream transactionlog;
-               transactionlog.open("transactionlog.txt", ios::out | ios::app);
+               transactionlog.open("transactionlog.txt", ios::out | ios::app); //(6)
                if (transactionlog.is_open()) {
-                   QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd-hh:mm:ss");
-                   transactionlog << timestamp.toStdString() << " | " << activeUserID << " | -" << beverages[id].getPrice() << "\t| " << users[activeUserID].getBalance() << "\t| " << beverages[id].getName() << endl;
+                   QString timestamp = QDateTime::currentDateTime().toString("MMddhhmmss"); //(7)
+                   transactionlog << timestamp.toStdString() << " | " << convertUserID(activeUserID) << " | -" << beverages[id].getPrice() << "\t| " << users[activeUserID].getBalance() << "\t| " << beverages[id].getName() << endl; //(8)
                }
                else {
-                   exit(-1);
+                   return false; //(9)
                }
-        transactionlog.close();
+        transactionlog.close(); //(10)
         clearGrid(ui->gridLayout_beverageselect);
-        updateBeverageGrid(beverages);
+        updateBeverageGrid(beverages); //11)
         ui->label_topNotificationBar->setText("ags Getränkekasse");
-        ui->label_balance->setText("");
-        updateMenuButtons(false);
-        ui->stackedWidget->setCurrentIndex(0);
-        activeUserID = -1; // Nutzer wird ausgeloggt; -1 stellt sicher, dass kein tatsächlich existierender Nutzer mehr ausgewählt ist
+        ui->label_balance->setText(""); //(12)
+        updateMenuButtons(false); //(13)
+        ui->stackedWidget->setCurrentIndex(0); //(14)
+        activeUserID = -1; // (15)
     }
     else {
-        ui->label_infobox->setText("Nicht mehr genug Geld vorhanden!");
-        return false;
+        ui->label_infobox->setText("Nicht mehr genug Geld vorhanden!"); //(16)
+        return false; //(17)
     }
     return true;
 }
@@ -397,21 +461,29 @@ bool userwindow::beverageButtonPressed(int id)
  */
 void userwindow::on_pushButton_pageBack_clicked()
 {
-    if (ui->stackedWidget->currentIndex() == 1) {
-        ui->label_topNotificationBar->setText("ags Getränkekasse");
-        ui->label_balance->setText("");
-        ui->label_infobox->setText("");
-        updateMenuButtons(false);
-        ui->stackedWidget->setCurrentIndex(0);
+    if (users.empty() || system.getPassword() == "pm-tnmjc") { // checking for completed first time setup
+        ui->textBrowser_clOutput->append("Bitte zuerst einen Nutzer anlegen und das Passwort ändern!");
+        ui->stackedWidget->setCurrentIndex(4);
+        ui->lineEdit_cl->setEchoMode(QLineEdit::Normal);
+        adminLoggedIn = true;
     }
     else {
-        ui->label_display->setText("");
-        ui->label_error->setText("");
-        ui->textBrowser_history->setText("");
-        updateMenuButtons(true);
-        ui->lineEdit_cl->setEchoMode(QLineEdit::Password);
-        adminLoggedIn = false;
-        ui->stackedWidget->setCurrentIndex(1);
+        if (ui->stackedWidget->currentIndex() == 1) {
+            ui->label_topNotificationBar->setText("ags Getränkekasse");
+            ui->label_balance->setText("");
+            ui->label_infobox->setText("");
+            updateMenuButtons(false);
+            ui->stackedWidget->setCurrentIndex(0);
+        }
+        else {
+            ui->label_display->setText("");
+            ui->label_error->setText("");
+            ui->textBrowser_history->setText("");
+            updateMenuButtons(true);
+            ui->lineEdit_cl->setEchoMode(QLineEdit::Password);
+            adminLoggedIn = false;
+            ui->stackedWidget->setCurrentIndex(1);
+        }
     }
 }
 
@@ -424,8 +496,8 @@ void userwindow::on_pushButton_history_clicked()
     updateMenuButtons(false);
     ui->pushButton_pageBack->setEnabled(true);
     ui->stackedWidget->setCurrentIndex(2);
-    string usrID = to_string(activeUserID);
-    size_t posUsrID = 20;
+    string usrID = convertUserID(activeUserID);
+    size_t posUsrID = 13;
     ifstream transactionlog;
     transactionlog.open("transactionlog.txt");
     if (transactionlog.is_open()) {
@@ -444,6 +516,7 @@ void userwindow::on_pushButton_history_clicked()
     }
     transactionlog.close();
 }
+
 /**\brief Mit einem Klick auf diesen Button wird die Seite zum Aufladen des Guthaben angezeigt
  * \Zusätzlich wird eine TransaktionsID generiert
  * \author Maximilian
@@ -453,15 +526,10 @@ void userwindow::on_pushButton_addMoney_clicked()
     updateMenuButtons(false);
     ui->pushButton_pageBack->setEnabled(true);
     ui->stackedWidget->setCurrentIndex(3);
-    QString ID;
-    if (activeUserID < 10) { //Um die immer gleiche Länge von TransaktionsIDs zu gewährleisten wird die UserID notfalls um eine Null verlängert
-        ID = "0" + QString::number(activeUserID);
-    }
-    else {
-        ID = QString::number(activeUserID);
-    }
-    ui->label_transactionID->setText(ID + QDateTime::currentDateTime().toString("yyMMddhhmm"));
+    QString ID = QString::fromStdString(convertUserID(activeUserID));
+    ui->label_transactionID->setText(ID + QDateTime::currentDateTime().toString("MMddhhmm"));
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Null in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -470,6 +538,7 @@ void userwindow::on_pushButton_0_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "0");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Eins in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -478,6 +547,7 @@ void userwindow::on_pushButton_1_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "1");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Zwei in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -486,6 +556,7 @@ void userwindow::on_pushButton_2_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "2");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Drei in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -494,6 +565,7 @@ void userwindow::on_pushButton_3_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "3");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Vier in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -502,6 +574,7 @@ void userwindow::on_pushButton_4_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "4");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Fünf in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -510,6 +583,7 @@ void userwindow::on_pushButton_5_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "5");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Sechs in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -518,6 +592,7 @@ void userwindow::on_pushButton_6_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "6");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Sieben in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -526,6 +601,7 @@ void userwindow::on_pushButton_7_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "7");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Acht in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -534,6 +610,7 @@ void userwindow::on_pushButton_8_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "8");
 }
+
 /**\brief Mit einem Klick auf den Button wird eine Neun in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -542,6 +619,7 @@ void userwindow::on_pushButton_9_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + "9");
 }
+
 /**\brief Mit einem Klick auf den Button wird ein Komma in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
  * \author Maximilian
  */
@@ -550,6 +628,7 @@ void userwindow::on_pushButton_colon_clicked()
     QString newBalance = ui->label_display->text();
     ui->label_display->setText(newBalance + ",");
 }
+
 /**\brief Mit einem Klick auf den Button wird die letzte Eingabe im Label geloescht
  * \author Maximilian
  */
@@ -559,6 +638,7 @@ void userwindow::on_pushButton_back_clicked()
     newBalance.chop(1);
     ui->label_display->setText(newBalance);
 }
+
 /**\brief Mit einem Klick auf den Button wird das Konto des Users mit dem eingegeben Geldbetrag aufgeladen
  * \Der gewünschte Geldbetrag wird ausgelesen, in einen Double konvertiert und dem Nutzer hinzugefügt
  * \Anschließend wird diese Transaktion in verschiedenen Logs niedergeschrieben und die veränderten Objekte werden in den jeweiligen Datenbanken gesichert
@@ -570,14 +650,10 @@ void userwindow::on_pushButton_saveTransaction_clicked()
     QString sTransactionID = ui->label_transactionID->text();
     double dNewBalance;
     if (sNewBalance.contains(",")) {
-        sNewBalance.replace(",",".");
-        QString checkFormatting = sNewBalance.right(3);
-        if (checkFormatting.contains(".")) {
-            dNewBalance = sNewBalance.toDouble();
-        }
-        else {
-            ui->label_error->setText("Fehler: Ungültiger Betrag!");
-        }
+        sNewBalance.replace(",","."); // , mit . ersetzen, da toDouble sonst nicht die gesamte Zahl erkennt
+        dNewBalance = sNewBalance.toDouble();
+        int iNewBalance = (dNewBalance * 100); // letzte zwei Nachkommastellen mit Aufnehmen, alles andere fällt weg
+        dNewBalance = (iNewBalance/100.0); // Zahl wieder in den Double zurück konvertieren
     }
     else {
        dNewBalance = sNewBalance.toDouble();
@@ -596,8 +672,8 @@ void userwindow::on_pushButton_saveTransaction_clicked()
     ofstream transactionlog; //Transaktion in transactionlog schreiben
            transactionlog.open("transactionlog.txt", ios::out | ios::app);
            if (transactionlog.is_open()) {
-               QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd-hh:mm:ss");
-               transactionlog << timestamp.toStdString() << " | " << activeUserID << " | +" << dNewBalance << "\t| " << users[activeUserID].getBalance() << "\t| " << "AUFLADUNG" << endl;
+               QString timestamp = QDateTime::currentDateTime().toString("MMddhhmmss");
+               transactionlog << timestamp.toStdString() << " | " << convertUserID(activeUserID) << " | +" << dNewBalance << "\t| " << users[activeUserID].getBalance() << "\t| " << "AUFLADUNG" << endl;
            }
            else {
                exit(-1);
@@ -805,10 +881,10 @@ void userwindow::on_lineEdit_cl_returnPressed()
         }
         else if (query[0] == "cleardeplog") {
             ofstream depositlog;
-            QString sID = "00" + QDateTime::currentDateTime().toString("yyMMddhhmm");
+            QString sID = "00" + QDateTime::currentDateTime().toString("MMddhhmm");
             depositlog.open("depositlog.txt");
             if (depositlog.is_open()) {
-                depositlog << sID.toStdString() << " | " << "Abbuchung durch Admin; neuer Kontostand [€]: " << system.getvBalance() << endl;
+                depositlog << sID.toStdString() << "-" << "Abbuchung durch Admin; neuer Kontostand [€]: " << system.getvBalance() << endl;
                 depositlog << "---" << endl;
             }
             else {
@@ -820,18 +896,28 @@ void userwindow::on_lineEdit_cl_returnPressed()
         else if (query[0] == "addusr") {
             if (query.size() == 3) {
                 string name = query[1].toStdString();
-
-                if (query[2] == "0" || query[2] == "1" || query[2] == "2") {
-                    int role = query[2].toInt();
-                    User newuser;
-                    newuser.createUser(name,role);
-                    users.push_back(newuser);
-                    writeUsersToDB(users);
-                    updateUserGrid(users);
-                    ui->textBrowser_clOutput->append("Der neue Nutzer " + QString::fromStdString(name) + " wurde erstellt und der Nutzderdatenbank hinzugefügt.");
+                bool userexists = false;
+                for (int i=0; i < users.size(); i++) {
+                    if (query[1] == QString::fromStdString(users[i].getName())) {
+                        userexists = true;
+                    }
+                }
+                if (!userexists) {
+                    if (query[2] == "0" || query[2] == "1" || query[2] == "2") {
+                        int role = query[2].toInt();
+                        User newuser;
+                        newuser.createUser(name,role);
+                        users.push_back(newuser);
+                        writeUsersToDB(users);
+                        updateUserGrid(users);
+                        ui->textBrowser_clOutput->append("Der neue Nutzer " + QString::fromStdString(name) + " wurde erstellt und der Nutzderdatenbank hinzugefügt.");
+                    }
+                    else {
+                       ui->textBrowser_clOutput->append("Die eingegebene Rolle ist nicht gültig!");
+                    }
                 }
                 else {
-                   ui->textBrowser_clOutput->append("Die eingegebene Rolle ist nicht gültig!");
+                    ui->textBrowser_clOutput->append("Der eingegebene Name existiert bereits!");
                 }
             }
             else {
@@ -887,16 +973,30 @@ void userwindow::on_lineEdit_cl_returnPressed()
         }
         else if (query[0] == "addbvr") {
             if (query.size() == 4) {
+                if (query[2].contains(",")) {
+                        query[2].replace(",",".");
+                }
                 string name = query[1].toStdString();
                 double price = query[2].toDouble();
                 int barcode = query[3].toInt();
-                Beverage newbeverage;
-                newbeverage.createBeverage(name,price,barcode);
-                beverages.push_back(newbeverage);
-                writeBeveragesToDB(beverages);
-                clearGrid(ui->gridLayout_beverageselect);
-                updateBeverageGrid(beverages);
-                ui->textBrowser_clOutput->append("Getränk wurde hinzugefügt und Datenbank aktualisiert.");
+                bool beverageexists = false;
+                for (int i=0; i < beverages.size(); i++) {
+                    if (name == beverages[i].getName() || barcode == beverages[i].getBarcode() ) {
+                        beverageexists = true;
+                    }
+                }
+                if (!beverageexists) {
+                    Beverage newbeverage;
+                    newbeverage.createBeverage(name,price,barcode);
+                    beverages.push_back(newbeverage);
+                    writeBeveragesToDB(beverages);
+                    clearGrid(ui->gridLayout_beverageselect);
+                    updateBeverageGrid(beverages);
+                    ui->textBrowser_clOutput->append("Getränk wurde hinzugefügt und Datenbank aktualisiert.");
+                }
+                else {
+                    ui->textBrowser_clOutput->append("Getränk mit dem gewünschten Namen oder Barcode existiert bereits!");
+                }
             }
             else {
                 ui->textBrowser_clOutput->append("Nicht genug oder zu viele Parameter für 'addbvr'...");
@@ -905,11 +1005,17 @@ void userwindow::on_lineEdit_cl_returnPressed()
         else if (query[0] == "delbvr") {
             if (query.size() == 2) {
                 int id = query[1].toInt();
-                beverages.erase(beverages.begin() + id);
-                writeBeveragesToDB(beverages);
-                clearGrid(ui->gridLayout_beverageselect);
-                updateBeverageGrid(beverages);
-                ui->textBrowser_clOutput->append("Getränk wurde gelöscht und Datenbanken aktualisiert.");
+                if (beverages[id].getStock() == 0) {
+                    beverages.erase(beverages.begin() + id);
+                    writeBeveragesToDB(beverages);
+                    clearGrid(ui->gridLayout_beverageselect);
+                    updateBeverageGrid(beverages);
+                    ui->textBrowser_clOutput->append("Getränk wurde gelöscht und Datenbanken aktualisiert.");
+                }
+                else {
+                    ui->textBrowser_clOutput->append("Getränk kann nicht gelöscht werden, es gibt noch Bestand!");
+                }
+
             }
             else {
                 ui->textBrowser_clOutput->append("Nicht genug oder zu viele Parameter für 'delbvr'...");
@@ -917,6 +1023,9 @@ void userwindow::on_lineEdit_cl_returnPressed()
         }
         else if (query[0] == "setbvrprice") {
             if (query.size() == 3) {
+                if (query[2].contains(",")) {
+                        query[2].replace(",",".");
+                }
                 int id = query[1].toInt();
                 double price = query[2].toDouble();
                 beverages[id].editPrice(price);

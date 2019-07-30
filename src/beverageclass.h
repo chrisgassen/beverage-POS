@@ -18,9 +18,9 @@ class Beverage {
         int lastOrder;
 	public:
         bool createBeverage(string nName, double nPrice, int nBarcode);
-		void editName(string nName);
-		void editPrice(double nPrice);
-		void editBarcode(int nBarcode);
+        bool editName(string nName);
+        bool editPrice(double nPrice);
+        bool editBarcode(int nBarcode);
         void setStock(int nStock);
         void setLastOrder(int nBottles);
 		string getName();

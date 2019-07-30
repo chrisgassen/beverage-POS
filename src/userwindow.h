@@ -44,6 +44,7 @@ public:
     vector<User> readUsersFromDB();
     vector<Beverage> readBeveragesFromDB();
     System readSystemFromDB();
+    string convertUserID(int id);
 
 public slots:
     bool userButtonPressed(int id);

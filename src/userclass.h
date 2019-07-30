@@ -23,7 +23,7 @@ public:
     string getName();
     double getBalance();
     int getRole();
-    void setBalance(double money);
+    bool setBalance(double money);
     // the following methods should only be accessible to users with a role value > 1! (~admin)
     void createUser(string nName, int nRole);
     void editName(string nName);
