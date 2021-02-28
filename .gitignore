@@ -1,0 +1,4 @@
+build-src-Desktop-Debug/*
+currentrelease/*
+src/src.pro.user
+src/src.pro.user*
