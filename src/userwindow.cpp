@@ -59,8 +59,8 @@ userwindow::userwindow(QWidget *parent) :
         ui->textBrowser_clOutput->append("setpw <Passwort>");
         ui->textBrowser_clOutput->append("Alternativ können Sie aus disesem Repo unter 'res/testDatabases' die Testdatenbanken neben die ausführbare Datei kopieren. Das Passwort lautet dann '1234'...");
         ui->textBrowser_clOutput->append("Für alle weiteren Kommandos zum verwalten dieser Software geben Sie bitte 'help' ein.");
-        ui->textBrowser_clOutput->append("Für eine ausführliche Dokumentation dieser Software besuchen Sie bitte unser Wiki:");
-        ui->textBrowser_clOutput->append("https://github.com/TUBSAPISS2019/pm-tnmjc/wiki");
+        ui->textBrowser_clOutput->append("Für eine ausführliche Dokumentation dieser Software besuchen Sie bitte das Repo:");
+        ui->textBrowser_clOutput->append("https://github.com/chrisgassen/beverage-POS");
         ui->textBrowser_clOutput->append("Fröhliches Getränkekaufen!");
     }
     else { // otherwise the program continues to load the other databases and finishes setting up the ui
@@ -742,6 +742,7 @@ void userwindow::on_lineEdit_cl_returnPressed()
             ui->textBrowser_clOutput->append("   [Listet alle Nutzer auf]");
             ui->textBrowser_clOutput->append("addusr <Name> <Rolle>");
             ui->textBrowser_clOutput->append("   [Erstellt einen neuen Nutzer]");
+            ui->textBrowser_clOutput->append("   [0=deaktiviert, 1=nutzer, 2=admin]");
             ui->textBrowser_clOutput->append("   <Name>=(string)");
             ui->textBrowser_clOutput->append("   <Rolle>=(int)");
             ui->textBrowser_clOutput->append("delusr <ID>");
