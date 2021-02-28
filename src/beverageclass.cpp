@@ -10,7 +10,6 @@
  * Initialisiert ein Getraenk mit den Attributen Name, Price, Barcode
  * \return bool (true, wenn alle drei Methoden erfolgreich abgeschlossen wurden)
  * \warning Der Bestand ist erst einmal fest auf 0 gestellt
- * \author Till
  */
 bool Beverage::createBeverage(string nName, double nPrice, int nBarcode) {
     bool name_ch,price_ch,barcode_ch;
@@ -31,7 +30,6 @@ bool Beverage::createBeverage(string nName, double nPrice, int nBarcode) {
  * Ueberprueft nur grob, ob die Eingaben ungefaehr passen, also der Name zumindest ein paar Zeichen umfasst
  * \return bool (true, wenn Namensänderung erfolgreich)
  * \warning Vor Aufrufen dieser Funktion sollte geprueft werden, ob bereits ein Objekt mit dem neuen gewuenschten Getraenknamen exisitiert!
- * \author Till
  */
 bool Beverage::editName(string nName) {
 	if (nName != "") {
@@ -47,7 +45,6 @@ bool Beverage::editName(string nName) {
  * \param nPrice (Preis des neuen Getraenks)
  * Ueberprueft, ob der eingegebene Preis positiv und groeßer 0 ist.
  * \return bool (true, wenn Preisänderung erfolgreich)
- * \author Till
  */
 bool Beverage::editPrice(double price) {
     if (price >= 0) {
@@ -64,7 +61,6 @@ bool Beverage::editPrice(double price) {
  * Ueberprueft, ob der eingegebene Barcode positiv und groeßer 0 ist.
  * \return bool (true, wenn Barcodeänderung erfolgreich)
  * \warning Vor Aufrufen dieser Funktion sollte geprueft werden, ob bereits ein Objekt mit dem neuen gewuenschten Barcode exisitiert!
- * \author Till
  */
 bool Beverage::editBarcode(int nBarcode) {
 	if (nBarcode >= 0) {
@@ -78,7 +74,6 @@ bool Beverage::editBarcode(int nBarcode) {
 
 /**\brief Setzt den aktuellen Bestand der Getraenke
  * \param nStock Bestand der Getraenke
- * \author Nicolas
  */
 void Beverage::setStock(int nStock)
 {
@@ -87,7 +82,6 @@ void Beverage::setStock(int nStock)
 
 /**\brief Setzt den Bestand, der durch die aktuelle Bestellung entstanden ist
  * \param nBottles Anzahl der Getränke der aktuellen Bestellung (+ aktuellen Bestand)
- * \author Jan-Uwe
  */
 void Beverage::setLastOrder(int nBottles)
 {
@@ -101,7 +95,6 @@ void Beverage::setLastOrder(int nBottles)
 
 /**\brief Gibt den Namen eines Getraenks zurueck
  * \return name (als string)
- * \author Till
  */
 string Beverage::getName() {
 	return name;
@@ -109,7 +102,6 @@ string Beverage::getName() {
 
 /**\brief Gibt den Preis eines Nutzers zurueck
  * \return price (als double)
- * \author Till
  */
 double Beverage::getPrice() {
 	return price;
@@ -117,7 +109,6 @@ double Beverage::getPrice() {
 
 /**\brief Gibt den Barcode eines Getraenks zurueck
  * \return barcode (als int)
- * \author Till
  */
 int Beverage::getBarcode() {
     return barcode;
@@ -125,7 +116,6 @@ int Beverage::getBarcode() {
 
 /**\brief Gibt den aktuellen Bestand der Getraenke zurueck
  * \return stock (als int)
- * \author Nicolas
  */
 int Beverage::getStock()
 {
@@ -134,7 +124,6 @@ int Beverage::getStock()
 
 /**\brief Gibt den Bestand, der durch die letzte Buchung entstanden ist, zurück
  * \return lastOrder (als int)
- * \author Jan-Uwe
  */
 int Beverage::getLastOrder()
 {

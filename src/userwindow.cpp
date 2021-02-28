@@ -11,7 +11,6 @@
  * Es wird zum Beispiel die Startseite, Schriftarten, der Text in Textfeldern und der Status von Buttons festgelegt.
  * Anschließend werden die Datenbanken gelesen und aus den daraus gewonnen Informationen noch die Buttons für die Nutzer- und Getränkeauswahl erzeugt.
  * \param QWidget (Widget-Zeug von Qt)
- * \author Chris
  */
 userwindow::userwindow(QWidget *parent) :
     QMainWindow(parent),
@@ -82,7 +81,6 @@ userwindow::~userwindow()
 //
 /**\brief Wandelt aktuelle Uhrzeit in String und lässt den Doppelpunkt blinken
  * \https://doc.qt.io/qt-5/qtwidgets-widgets-digitalclock-example.html
- * \author Till
  */
 void userwindow::showTime() {
     QTime time = QTime::currentTime();
@@ -97,7 +95,6 @@ void userwindow::showTime() {
  * Für jeden Nutzer im vector wird ein Button erstellt.
  * Zum Layout gehören z.b. folgende Eigenschaften: Textfeldgroesse, Schriftart- und -groesse, Icon, etc.
  * Zusätzlich wird jeder Button mit einem Signal-Mapper verbunden.
- * \author Nicolas
  */
 bool userwindow::updateUserGrid(vector<User> fUsers) {
     QFont latoFont("Lato", 12, QFont::Medium, false);
@@ -126,7 +123,6 @@ bool userwindow::updateUserGrid(vector<User> fUsers) {
  * Zusätzlich wird jeder Button mit einem Signal-Mapper verbunden.
  * \param vector<Beverage> (alle Getränkeobjekte im Vector)
  * \return true (standardmäßig; in Version 2 könnten mit der false-Rückgabe auch Fehler ausgegeben werden)
- * \author Nicolas
  */
 bool userwindow::updateBeverageGrid(vector<Beverage> fBeverages) {
     QFont latoFont("Lato", 12, QFont::Medium, false);
@@ -154,7 +150,6 @@ bool userwindow::updateBeverageGrid(vector<Beverage> fBeverages) {
 
 /**\brief rekursiv aufgerufenes Layout Setup, kann von Nutzerauswahl und von Getränkeauswahl aufgerufen werden
  * \return Widgets (Pushbutton)
- * \author Jan-Uwe
  */
 bool userwindow::clearGrid(QLayout *layout)
 {
@@ -171,7 +166,6 @@ bool userwindow::clearGrid(QLayout *layout)
  * \Der Settingsbutton wird nur für den Betreiber/Admin aktiv gesetzt
  * \param bool status (true oder false, also Button aktiv oder inaktiv setzen)
  * \return true (per Default [in zukünftigen Versionen könnte noch auf Fehler hingewiesen werden, dann false bei Fehler])
- * \author Maximilian
  */
 bool userwindow::updateMenuButtons(bool status)
 {
@@ -201,7 +195,6 @@ bool userwindow::updateMenuButtons(bool status)
  * \param vector<User> fUser (der Methode wird der Vektor, der aus allen Nutzerobjekten besteht, übergeben)
  * \return  true (wenn Methode ohne größere Fehler abgeschlossen)
  *          false (wenn Datenbank nicht geöffnet werden konnte)
- * \author Chris
  */
 bool userwindow::writeUsersToDB(vector<User> fUser) {
     ofstream tmpUserDB;
@@ -224,7 +217,6 @@ bool userwindow::writeUsersToDB(vector<User> fUser) {
  * Die verschiedenen Attribute eines jeden Getränks werden durch Semikolons getrennt.
  * Wenn alle Objekte "abgeschrieben" wurden, wird die Datei geschlossen.
  * \param vector<Beverage> fBeverage (der Methode wird der Vektor, der aus allen Getränkeobjekten besteht, übergeben)
- * \author Chris
  */
 bool userwindow::writeBeveragesToDB(vector<Beverage> fBeverage) {
     ofstream tmpBeverageDB;
@@ -243,7 +235,6 @@ bool userwindow::writeBeveragesToDB(vector<Beverage> fBeverage) {
 
 /**\brief Schreibt die Systemeinstellungen in ein Textdokument
  * \param System
- * \author Maximilian
  */
 bool userwindow::writeSystemToDB(System) {
     ofstream tmpSystemDB;
@@ -266,7 +257,6 @@ bool userwindow::writeSystemToDB(System) {
  * Die jeweiligen Substrings werden je nach Attribut konvertiert und in einen temporären Nutzer geschrieben.
  * Der temporäre Nutzer wird anschließend in einem Vektor verstaut.
  * \return vector<User> fUser (gibt den Vektor, der alle Nutzerobjekte enthält, aus)
- * \author Chris
  */
 vector<User> userwindow::readUsersFromDB() {
     vector<User> fUser;
@@ -305,7 +295,6 @@ vector<User> userwindow::readUsersFromDB() {
  * Die jeweiligen Substrings werden je nach Attribut konvertiert und in ein temporäres Getränk geschrieben.
  * Das temporäre Getränk wird anschließend in einem Vektor verstaut.
  * \return vector<Beverage> fBeverage (gibt den Vektor, der alle Getränkeobjekte enthält, aus)
- * \author Nicolas
  */
 vector<Beverage> userwindow::readBeveragesFromDB() {
     vector<Beverage> fBeverage;
@@ -345,7 +334,6 @@ vector<Beverage> userwindow::readBeveragesFromDB() {
 
 /**\brief Passwort und Guthaben des Systems werden aus der Datenbank(DB) ausgelesen
  * \return Objekt fSystem
- * \author Maximilian
  */
 System userwindow::readSystemFromDB() {
     System fSystem;
@@ -369,7 +357,6 @@ System userwindow::readSystemFromDB() {
  * \param id (ID des aktiven Users als int)
  * \return sID (ID als "normalisierter" string)
  * \warning Diese Methode geht davon aus, dass es nicht mehr als 100 Nutzer gibt!!
- * \author Nicolas
  */
 string userwindow::convertUserID(int id)
 {
@@ -391,7 +378,6 @@ string userwindow::convertUserID(int id)
 /**\brief avtiveUserID wird die ID des ausgewählten Benutzers übergeben. Um nach der Ausgabe den Name des eingeloggten Nutzers anzuzeigen, wird mit der Methode "getName()" der Name der ausgewählten Person abgefragt. Um dem Nutzer nun sein aktuelles Guthaben anzuzeigen, wird dieses mit der Methode "getBalance()" aus der Datenbank anhand der UserID angefragt. Der Name und das Guthaben werden in der Kopfleiste der GUI ausgegeben. Um weitere Aktionen durchzuführen wird zusätzlich eine neue GUI-Seite angezeigt, auf der nun Getränke gewählt, die Buchungshistorie eingesehen, Geldaufgeladen, sich als Admin in die Einstellungen einzuloggen oder sich wieder auszuloggen.
  * \param id (ID des aktiven Users)
  * \return wenn die Funktion komplett durchlaufen wurde, gibt sie den Wert "true" zurück
- * \author Nicolas
  */
 bool userwindow::userButtonPressed(int id)
 {
@@ -421,7 +407,6 @@ bool userwindow::userButtonPressed(int id)
  * \param Getränke id
  * \return false (Buchung konnte nicht durchgeführt werden (17), oder Log konnte nicht geöffnet werden (9))
            true (Buchung konnte erfolgreich durchgeführt werden)
- * \author Jan-Uwe
  */
 bool userwindow::beverageButtonPressed(int id)
 {
@@ -457,7 +442,6 @@ bool userwindow::beverageButtonPressed(int id)
 
 /**\brief Mit einem Klick auf diesen Button wird zur vorherigen Seite navigiert
  * \Je nach Ausgangsseite wird man auf eine andere Seite zurückgeleitet
- * \author Maximilian
  */
 void userwindow::on_pushButton_pageBack_clicked()
 {
@@ -489,7 +473,6 @@ void userwindow::on_pushButton_pageBack_clicked()
 
 /**\brief Zeigt die Historie der Buchungen (gekauften Getränke)
  * Es wird in der Logdatei nach allen Buchungen des jeweils aktiven Nutzers gesucht und die jeweilige Buchung ausgegeben.
- * \author Chris
  */
 void userwindow::on_pushButton_history_clicked()
 {
@@ -519,7 +502,6 @@ void userwindow::on_pushButton_history_clicked()
 
 /**\brief Mit einem Klick auf diesen Button wird die Seite zum Aufladen des Guthaben angezeigt
  * \Zusätzlich wird eine TransaktionsID generiert
- * \author Maximilian
  */
 void userwindow::on_pushButton_addMoney_clicked()
 {
@@ -531,7 +513,6 @@ void userwindow::on_pushButton_addMoney_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Null in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_0_clicked()
 {
@@ -540,7 +521,6 @@ void userwindow::on_pushButton_0_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Eins in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_1_clicked()
 {
@@ -549,7 +529,6 @@ void userwindow::on_pushButton_1_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Zwei in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_2_clicked()
 {
@@ -558,7 +537,6 @@ void userwindow::on_pushButton_2_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Drei in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_3_clicked()
 {
@@ -567,7 +545,6 @@ void userwindow::on_pushButton_3_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Vier in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_4_clicked()
 {
@@ -576,7 +553,6 @@ void userwindow::on_pushButton_4_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Fünf in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_5_clicked()
 {
@@ -585,7 +561,6 @@ void userwindow::on_pushButton_5_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Sechs in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_6_clicked()
 {
@@ -594,7 +569,6 @@ void userwindow::on_pushButton_6_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Sieben in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_7_clicked()
 {
@@ -603,7 +577,6 @@ void userwindow::on_pushButton_7_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Acht in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_8_clicked()
 {
@@ -612,7 +585,6 @@ void userwindow::on_pushButton_8_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird eine Neun in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_9_clicked()
 {
@@ -621,7 +593,6 @@ void userwindow::on_pushButton_9_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird ein Komma in das Label auf der Seite zum Aufladen des Guthabens hinzugefügt
- * \author Maximilian
  */
 void userwindow::on_pushButton_colon_clicked()
 {
@@ -630,7 +601,6 @@ void userwindow::on_pushButton_colon_clicked()
 }
 
 /**\brief Mit einem Klick auf den Button wird die letzte Eingabe im Label geloescht
- * \author Maximilian
  */
 void userwindow::on_pushButton_back_clicked()
 {
@@ -642,7 +612,6 @@ void userwindow::on_pushButton_back_clicked()
 /**\brief Mit einem Klick auf den Button wird das Konto des Users mit dem eingegeben Geldbetrag aufgeladen
  * \Der gewünschte Geldbetrag wird ausgelesen, in einen Double konvertiert und dem Nutzer hinzugefügt
  * \Anschließend wird diese Transaktion in verschiedenen Logs niedergeschrieben und die veränderten Objekte werden in den jeweiligen Datenbanken gesichert
- * \author Maximilian
  */
 void userwindow::on_pushButton_saveTransaction_clicked()
 {
@@ -690,7 +659,6 @@ void userwindow::on_pushButton_saveTransaction_clicked()
 
 /**\brief Zeigt das Einstellungs-Fenster
  * ... und setzt ein paar entsprechende Stati von Buttons und Textfeldern neu...
- * \author Chris
  */
 void userwindow::on_pushButton_settings_clicked()
 {
@@ -709,7 +677,6 @@ void userwindow::on_pushButton_settings_clicked()
  * ... oder die in den anderen Wörtern angegebenen Parameter werden noch überprüft, umgewandelt und der gewünschten Operation als Attribut(e) übergeben.
  * Mit diesem Wissen sollten die jeweiligen Blöcke ziemlich selbsterklärend sein.
  * Etwas speziell ist noch die Funktion zum Einloggen. Es kann zwar nur ein Admin auf die Einstellungen zugreifen, aber um ganz großen Unfug zu verhindern, sind die Einstellungen noch pro-forma durch ein Passwort geschützt. (Schließlich muss man sich zur besseren Usability als Nutzer ja nicht einloggen)
- * \author Chris
  */
 void userwindow::on_lineEdit_cl_returnPressed()
 {

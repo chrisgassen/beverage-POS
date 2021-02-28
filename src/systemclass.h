@@ -3,7 +3,6 @@
 /**\brief Klasse "Systemclass" für das Speichern von Systemweiten Attributen.
  * Die GUI erstellt genau ein Objekt dieser Klasse beim Programmstart.
  * Die Inhalte der Attribute werden in einer Textdatei gesichert und dementsprechend beim Programmstart aus dieser auch gelesen.
- * \author Maximilian
  */
 class System {
 private:

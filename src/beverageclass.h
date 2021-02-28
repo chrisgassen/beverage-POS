@@ -7,7 +7,6 @@
  * Dementsprechend wird beim Programmstart zuerst die Textdatei ausgelesen.
  * Außerhalb des Vektors sollten nur temporär Objekte dieser Klasse aktiv sein, da auf die einzelnen Attribute meist über den Vektor zugegriffen wird.
  * Wird ein neues Objekt erstellt (also "neu neu" und nicht nur aus der Textdatei ausgelesen), so müssen die Attribute immer über die jeweiligen Methoden gesetzt werden.
- * \author Till
  */
 class Beverage {
 	private:

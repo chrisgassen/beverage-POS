@@ -9,7 +9,6 @@
  * Erstellt das GUI (zum Teil dynamisch) und verbindet Eingaben über Signals und Slots mit verschiedenen Ausgaben.
  * Greift auf die Klassen "beverageclass", "userclass" und "systemclass" zu und managed die Objekte dieser Klassen (zum Teil in Vektoren).
  * Kümmert sich um die Persistenz der Daten.
- * \author Chris
  */
 namespace Ui {
 class userwindow;
